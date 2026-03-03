@@ -1,0 +1,23 @@
+# ServerForge - Nginx Server Block for Static Site — HTTP only
+# Generated for: {{APP_NAME}} (pre-SSL)
+# This config is used temporarily to obtain SSL certificates via Certbot.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{DOMAIN}} {{DOMAIN_ALIASES}};
+
+    # Let's Encrypt ACME challenge
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    # Application root
+    root {{APP_ROOT}};
+    index index.html;
+
+    # Clean URLs: /privacy serves privacy.html
+    location / {
+        try_files $uri $uri.html $uri/ =404;
+    }
+}

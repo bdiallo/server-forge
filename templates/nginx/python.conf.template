@@ -1,0 +1,71 @@
+# ServerForge - Nginx Server Block for Python (Gunicorn)
+# Generated for: {{APP_NAME}}
+
+upstream {{APP_NAME}}_gunicorn {
+    server {{APP_UPSTREAM}};
+}
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{DOMAIN}} {{DOMAIN_ALIASES}};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS server
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name {{DOMAIN}} {{DOMAIN_ALIASES}};
+
+    # SSL certificates
+    ssl_certificate /etc/letsencrypt/live/{{DOMAIN}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{DOMAIN}}/privkey.pem;
+    include /etc/nginx/snippets/ssl-params.conf;
+
+    # Application root
+    root {{APP_ROOT}};
+
+    # Logging
+    access_log /var/log/nginx/{{APP_NAME}}_access.log;
+    error_log /var/log/nginx/{{APP_NAME}}_error.log;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Serve static files (Django/Flask)
+    location /static/ {
+        alias {{APP_ROOT}}/static/;
+        expires max;
+        add_header Cache-Control public;
+    }
+
+    location /media/ {
+        alias {{APP_ROOT}}/media/;
+        expires max;
+        add_header Cache-Control public;
+    }
+
+    # Proxy to Gunicorn
+    location / {
+        proxy_pass http://{{APP_NAME}}_gunicorn;
+        include /etc/nginx/snippets/proxy-params.conf;
+    }
+
+    # WebSocket support (Django Channels / FastAPI)
+    location /ws/ {
+        proxy_pass http://{{APP_NAME}}_gunicorn;
+        include /etc/nginx/snippets/proxy-params.conf;
+        proxy_buffering off;
+    }
+}
