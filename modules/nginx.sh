@@ -130,6 +130,8 @@ EOF
       export APP_ROOT="${APP_ROOT:-/var/www/${APP_NAME}/current/public}"
       export APP_UPSTREAM="${APP_UPSTREAM:-unix:/var/www/${APP_NAME}/shared/tmp/sockets/puma.sock}"
       export NGINX_CLIENT_MAX_BODY_SIZE="${NGINX_CLIENT_MAX_BODY_SIZE:-100M}"
+      # Upstream name must be unique per site (avoid collisions when same app has staging + production)
+      export UPSTREAM_NAME="${UPSTREAM_NAME:-$(echo "${DOMAIN}" | sed 's/[^a-zA-Z0-9]/_/g')}"
 
       local site_conf="/etc/nginx/sites-available/${conf_filename}"
       template_file "$template" "$site_conf"

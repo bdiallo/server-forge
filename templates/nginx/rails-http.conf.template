@@ -2,7 +2,7 @@
 # Generated for: {{APP_NAME}} (pre-SSL)
 # This config is used temporarily to obtain SSL certificates via Certbot.
 
-upstream {{APP_NAME}}_puma {
+upstream {{UPSTREAM_NAME}} {
     server {{APP_UPSTREAM}};
 }
 
@@ -25,7 +25,7 @@ server {
     }
 
     location @puma {
-        proxy_pass http://{{APP_NAME}}_puma;
+        proxy_pass http://{{UPSTREAM_NAME}};
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

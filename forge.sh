@@ -379,6 +379,7 @@ cmd_nginx_conf() {
   export APP_ROOT="${APP_ROOT:-/var/www/${name}/current/public}"
   export APP_UPSTREAM="${APP_UPSTREAM:-unix:/var/www/${name}/shared/tmp/sockets/puma.sock}"
   export NGINX_CLIENT_MAX_BODY_SIZE="${NGINX_CLIENT_MAX_BODY_SIZE:-100M}"
+  export UPSTREAM_NAME="${UPSTREAM_NAME:-$(echo "${DOMAIN}" | sed 's/[^a-zA-Z0-9]/_/g')}"
 
   log_step "Generating Nginx conf: ${conf_filename}"
   log_substep "Domain: ${DOMAIN}"

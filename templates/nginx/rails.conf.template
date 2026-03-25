@@ -1,7 +1,7 @@
 # ServerForge - Nginx Server Block for Rails (Puma)
 # Generated for: {{APP_NAME}}
 
-upstream {{APP_NAME}}_puma {
+upstream {{UPSTREAM_NAME}} {
     server {{APP_UPSTREAM}};
 }
 
@@ -58,14 +58,14 @@ server {
     }
 
     location @puma {
-        proxy_pass http://{{APP_NAME}}_puma;
+        proxy_pass http://{{UPSTREAM_NAME}};
         include /etc/nginx/snippets/proxy-params.conf;
         proxy_buffering off;
     }
 
     # ActionCable / Solid Cable WebSocket
     location /cable {
-        proxy_pass http://{{APP_NAME}}_puma;
+        proxy_pass http://{{UPSTREAM_NAME}};
         include /etc/nginx/snippets/proxy-params.conf;
         proxy_buffering off;
     }
